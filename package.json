@@ -1,0 +1,13 @@
+{
+  "name": "untitled-folder",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": { "moment": "^2.30.1", "zklib": "^0.2.11" }
+}
