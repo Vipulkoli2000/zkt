@@ -20,50 +20,50 @@ function convertToGMT(date) {
 
 // Example usage:
 const now = new Date();
-logger(convertToGMT(now)); // e.g., "Wed, 13 Dec 2024 11:15:30 GMT"
+logger(convertToGMT(now));
 
-// Listen to all requests on /iclock/cdata
 app.get("/iclock/cdata", (req, res) => {
-  logger("cdata endpoint hit");
-  const { SN } = req.query;
-  logger(req.body);
-  logger(req.query);
-
   const now = new Date();
 
-  // Create the response body
-  const body = `GET OPTION FROM: ${SN || "0316144680030"}
-ATTLOGStamp=None
-OPERLOGStamp=9999
-ATTPHOTOStamp=None
-ErrorDelay=30
-Delay=10
-TransTimes=00:00;14:05
-TransInterval=1
-TransFlag=TransData AttLog OpLog
-ChgFP
-UserPic
-TimeZone=8
-Realtime=1
-Encrypt=None
-P a g e | 25
-AttPhoto
-EnrollUser
-ChgUser EnrollFP`;
+  try {
+    logger("cdata endpoint hit");
 
-  // Set headers
-  res.set({
-    "Content-Type": "text/plain",
-    "Content-Length": Buffer.byteLength(body, "utf-8"),
-    Connection: "close",
-    Pragma: "no-cache",
-    "Cache-Control": "no-store",
-    Date: now.toUTCString(),
-    Server: "nginx/1.6.0",
-  });
+    // Extract and validate the SN parameter
+    console.log(req.query);
+    console.log(req.headers);
+    const { SN } = req.query;
+    if (!SN || typeof SN !== "string") {
+      logger("SN query parameter missing or invalid");
+      return res
+        .status(400)
+        .send("Bad Request: SN is required and must be a string");
+    }
 
-  // Send the response
-  return res.status(200).send(body);
+    // Create the response body (use \n for line breaks)
+    const body = `GET OPTION FROM:${SN}\nATTLOGStamp=None\nOPERLOGStamp=9999`;
+
+    const contentLength = Buffer.byteLength(body, "utf-8");
+
+    // Prepare response headers
+    res.set({
+      "Content-Type": "text/plain",
+      "Content-Length": contentLength,
+      Pragma: "no-cache",
+      "Cache-Control": "no-store",
+      Date: convertToGMT(now),
+      Server: "nginx/1.6.0",
+    });
+
+    // Log response info
+    logger("Response Size:", contentLength);
+    logger("Response Date:", convertToGMT(now));
+
+    // Send response
+    return res.status(200).send(body);
+  } catch (error) {
+    logger("Error occurred:", error);
+    return res.status(500).send("Internal Server Error");
+  }
 });
 
 app.get("/iclock/getrequest", (req, res) => {
