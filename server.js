@@ -150,6 +150,12 @@ app.get("/iclock/cdata", (req, res) => {
   }
 });
 
+app.post("/iclock/cdata", (req, res) => {
+  console.log("postEndpoint Hit");
+
+  res.send(200);
+});
+
 app.get("/users", (req, res) => {
   const query = `SELECT * FROM users`;
   db.all(query, [], (err, rows) => {
@@ -179,6 +185,7 @@ app.get("/iclock/getrequest", (req, res) => {
     Server: "nginx/1.6.0",
   });
 
+  
   // Example response
   const cmd = `C:12312:DATA UPDATE BIODATA PIN=1\tFID=1\tMajorVer=8\tMinorVer=8\tSize=${contentLength}\tValid=0\tTMP=${base64image}`;
 
